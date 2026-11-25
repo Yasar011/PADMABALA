@@ -11,6 +11,8 @@ if (btn && menu) {
     btn.setAttribute('aria-expanded', open);
     btn.querySelector('span').textContent = open ? 'Close' : 'Menu';
     if (open) menu.querySelector('a').focus();
+    if (open && window.gsap && !reduce) gsap.from(menu.querySelectorAll('.m-item, .m-links a'),
+      { y: 24, opacity: 0, duration: .6, stagger: .05, ease: 'power3.out', clearProps: 'all' });
   };
   btn.addEventListener('click', () => set(menu.hidden));
   menu.addEventListener('click', (ev) => { if (ev.target.closest('a')) set(false); });
@@ -56,9 +58,23 @@ document.querySelectorAll('.s-item').forEach((it) => {
   });
 });
 
-// 4. Gentle reveal on scroll
+// 4. Reveal on scroll: GSAP + ScrollTrigger when loaded, IntersectionObserver fallback if the CDN fails
 const rv = document.querySelectorAll('main section:not(.hero-full):not(.opener), .garment, .s-item, .spec');
-if ('IntersectionObserver' in window && !reduce) {
+const G = window.gsap && window.ScrollTrigger && !reduce;
+if (G) {
+  gsap.registerPlugin(ScrollTrigger);
+  rv.forEach((el) => gsap.from(el, { y: 48, opacity: 0, duration: 1, ease: 'power3.out',
+    scrollTrigger: { trigger: el, start: 'top 88%', once: true } }));
+  // hero + opener intro, then slow parallax on full-bleed photos
+  gsap.from('.bar > *, .hero-cta, .hero-cap', { y: -16, opacity: 0, duration: .8, stagger: .08, ease: 'power2.out', delay: .2 });
+  gsap.from('.hero-full > img, .op-img img', { scale: 1.12, duration: 1.8, ease: 'power3.out' });
+  document.querySelectorAll('.hero-full, .op-img, .bleed-line').forEach((box) => {
+    gsap.to(box.querySelector('img'), { yPercent: 14, ease: 'none',
+      scrollTrigger: { trigger: box, start: 'top top', end: 'bottom top', scrub: true } });
+  });
+  gsap.from('.op-txt .display, .op-txt > .label', { y: 40, opacity: 0, duration: 1, stagger: .1, ease: 'power3.out',
+    scrollTrigger: { trigger: '.op-txt', start: 'top 85%', once: true } });
+} else if ('IntersectionObserver' in window && !reduce) {
   const io = new IntersectionObserver((es) => es.forEach((en) => {
     if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
   }), { rootMargin: '0px 0px -8% 0px' });

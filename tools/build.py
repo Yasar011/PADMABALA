@@ -103,6 +103,8 @@ def page(fname, title, desc, body, accent='#990213', accent_dark='#D69038'):
   </ul>
   <p class="label foot-small">Padmabala S — B.Des Fashion Design, NIFT Jodhpur, 2023–2027</p>
 </footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
 <script src="main.js" defer></script>
 </body></html>'''
     open(os.path.join(SITE, fname), 'w', encoding='utf-8').write(doc)
